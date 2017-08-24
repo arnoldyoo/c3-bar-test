@@ -385,11 +385,48 @@
             })
             .on('click', function (d) {
                 var pos = d3.mouse(this);
-                console.log($$);
-                console.log($$.height);
-                var baseGroup = $$.d3.select('.'+CLASS.chart).append('g').attr('class','base-line').attr("transform", "translate(" + (pos[0] + "," + 0 + ")"));
-                baseGroup.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', $$.height).style('stroke', 'green').style('stroke-width', 1);
 
+                if ($$.baseGroup) {
+                    $$.baseGroup.remove();
+                }
+                
+                $$.baseGroup = $$.d3.select('.'+CLASS.chart)
+                                    .append('g')
+                                    .attr('class','base-line')
+                                    .attr("transform", "translate(" + (pos[0] + "," + 0 + ")"));
+                                    
+                $$.baseGroup.append('line')
+                            .attr('x1', 0)
+                            .attr('y1', 0)
+                            .attr('x2', 0)
+                            .attr('y2', $$.height)
+                            .style('stroke', 'green')
+                            .style('stroke-width', 1);
+
+                var rectsEl = $$.mainBar[0];
+                rectsEl.map(r => {
+                    var rectSvg = d3.select(r);
+                    var pathArray = rectSvg.attr('d').split(' ');
+                    var xyArray = pathArray[2].split(',');
+                    var widthCompare = xyArray[0].replace(/\L/g,'');
+                    var compareArr = pathArray[4].split(',');
+                    var height = (+compareArr[1]) - (+xyArray[1]);
+                    var x = 0;
+                    var y = xyArray[1];
+                    var width = widthCompare - pos[0];
+
+                    console.log('w', width);
+                    console.log('h', height);
+                    console.log('x', x);
+                    console.log('y', y);
+                    $$.baseGroup.append('rect')
+                                .attr('x', x)
+                                .attr('y', y)
+                                .attr('width', width)
+                                .attr('height', height)
+                                .attr('fill', 'red')
+                                .attr('fill-opacity', 0.9);
+                })
                 
                 var index = d.index;
                 $$.main.select('.'+CLASS.dragarea+$$.randomUid).remove();
